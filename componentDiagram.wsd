@@ -1,0 +1,48 @@
+@startuml "Deployment diagram"
+
+node Device {
+    [Browser]
+}
+
+note top of Device: Mobile, Laptop etc.
+
+node NGINX {
+    package "React Application" {
+        [React Components]
+        [Service] as UIService
+        [Axios]
+        [Axios] - HTTP
+    }
+}
+
+note top of NGINX: React Application is deployed in NGINX
+
+[React Components] -d-> [UIService]
+[UIService] -d-> [Axios]
+
+node Tomcat {
+    package "Spring Boot REST API" {
+        [Controller]
+        [Service] as RESTService
+        [Domain]
+        [Hibernate]
+        DataAccess -u- [Hibernate]
+    }
+}
+
+[Controller] -d-> [RESTService]
+[RESTService] -d-> [Domain]
+[RESTService] -d-> [Hibernate]
+
+
+database "MySQL" {
+    [Schema]
+}
+
+Device --> NGINX : HTTPS GET assets (HTML, CSS, Javascript, Images etc.)
+
+Device --> Tomcat : HTTPS Requests
+
+[Hibernate] -d-> "MySQL"
+
+@enduml
